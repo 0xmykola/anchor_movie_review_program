@@ -44,6 +44,11 @@ pub mod anchor_movie_review_program {
 
         Ok(())
     }
+
+    pub fn delete_movie_review(_ctx: Context<DeleteMovieReview>, title: String) -> Result<()> {
+        msg!("Movie review for {} deleted", title);
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
@@ -73,6 +78,16 @@ pub struct UpdateMovieReview<'info> {
         realloc::payer = initializer,
         realloc::zero = true,
     )]
+    pub movie_review: Account<'info, MovieAccountState>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(title: String)]
+pub struct DeleteMovieReview<'info> {
+    #[account(mut, seeds=[title.as_bytes(), initializer.key().as_ref()], bump, close=initializer)]
     pub movie_review: Account<'info, MovieAccountState>,
     #[account(mut)]
     pub initializer: Signer<'info>,
